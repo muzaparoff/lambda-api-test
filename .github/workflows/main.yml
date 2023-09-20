@@ -1,0 +1,36 @@
+name: Deploy AWS Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Terraform
+        run: |
+          wget https://releases.hashicorp.com/terraform/0.15.5/terraform_0.15.5_linux_amd64.zip
+          unzip terraform_0.15.5_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform --version
+
+      - name: Zip Python code
+        run: |
+          zip -r lambda.zip lambda_function.py
+
+      - name: Initialize and apply Terraform
+        run: |
+          cd path/to/terraform/directory  # Change to your Terraform project directory
+          terraform init
+          terraform apply -auto-approve
